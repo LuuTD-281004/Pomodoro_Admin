@@ -1,36 +1,47 @@
-"use client"
+"use client";
 
-import type React from "react"
+import type React from "react";
 
-import { useState } from "react"
-import { useRouter } from "next/navigation"
-import { Button } from "@/components/ui/button"
-import { Input } from "@/components/ui/input"
-import { Label } from "@/components/ui/label"
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
-import { Eye, EyeOff, Shield, User, Lock } from "lucide-react"
+import { useState } from "react";
+import { useRouter } from "next/navigation";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
+import { Eye, EyeOff, Shield, User, Lock } from "lucide-react";
+import { useAuth } from "@/context/auth-context";
+import { showNotification } from "./notification-helper";
 
 export function AdminLogin() {
-  const [email, setEmail] = useState("")
-  const [password, setPassword] = useState("")
-  const [showPassword, setShowPassword] = useState(false)
-  const [isLoading, setIsLoading] = useState(false)
-  const router = useRouter()
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+  const [showPassword, setShowPassword] = useState(false);
+  const [isLoading, setIsLoading] = useState(false);
+  const router = useRouter();
+  const { login } = useAuth();
 
   const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault()
-    setIsLoading(true)
-
-    // Simulate login process
-    await new Promise((resolve) => setTimeout(resolve, 1000))
-
-    // For demo purposes, accept any email/password
-    if (email && password) {
-      router.push("/dashboard")
+    e.preventDefault();
+    try {
+      setIsLoading(true);
+      const result = await login(email, password);
+      console.log(result);
+      setIsLoading(false);
+    } catch (e) {
+      console.log(e);
+      setIsLoading(false);
+      showNotification.error(
+        "Invalid email or password",
+        "Please try again"
+      );
     }
-
-    setIsLoading(false)
-  }
+  };
 
   return (
     <div className="min-h-screen bg-background flex items-center justify-center p-4">
@@ -42,7 +53,9 @@ export function AdminLogin() {
           </div>
           <div className="space-y-2">
             <h1 className="text-3xl font-bold text-foreground">Admin Portal</h1>
-            <p className="text-muted-foreground">Sign in to access the admin dashboard</p>
+            <p className="text-muted-foreground">
+              Sign in to access the admin dashboard
+            </p>
           </div>
         </div>
 
@@ -50,7 +63,9 @@ export function AdminLogin() {
         <Card className="border-border bg-card">
           <CardHeader className="space-y-1">
             <CardTitle className="text-2xl text-center">Sign In</CardTitle>
-            <CardDescription className="text-center">Enter your credentials to continue</CardDescription>
+            <CardDescription className="text-center">
+              Enter your credentials to continue
+            </CardDescription>
           </CardHeader>
           <CardContent>
             <form onSubmit={handleSubmit} className="space-y-4">
@@ -92,7 +107,11 @@ export function AdminLogin() {
                     onClick={() => setShowPassword(!showPassword)}
                     className="absolute right-3 top-3 text-muted-foreground hover:text-foreground"
                   >
-                    {showPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
+                    {showPassword ? (
+                      <EyeOff className="h-4 w-4" />
+                    ) : (
+                      <Eye className="h-4 w-4" />
+                    )}
                   </button>
                 </div>
               </div>
@@ -107,7 +126,9 @@ export function AdminLogin() {
             </form>
 
             <div className="mt-6 text-center">
-              <p className="text-xs text-muted-foreground">Demo: Use any email and password to login</p>
+              <p className="text-xs text-muted-foreground">
+                Demo: Use any email and password to login
+              </p>
             </div>
           </CardContent>
         </Card>
@@ -118,5 +139,5 @@ export function AdminLogin() {
         </div>
       </div>
     </div>
-  )
+  );
 }
