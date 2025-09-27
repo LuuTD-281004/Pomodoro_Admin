@@ -1,5 +1,6 @@
 "use client"
 
+import { usePathname, useRouter } from "next/navigation"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
@@ -14,10 +15,19 @@ import {
 import { Search, Bell, User, LogOut } from "lucide-react"
 
 interface DashboardHeaderProps {
-  title: string
+  routeTitles: Record<string, string>
 }
 
-export function DashboardHeader({ title }: DashboardHeaderProps) {
+export function DashboardHeader({ routeTitles }: DashboardHeaderProps) {
+  const pathname = usePathname()
+  const router = useRouter()
+
+  const title = routeTitles[pathname] || "Dashboard"
+
+  const handleLogout = () => {
+    router.push("/")
+  }
+
   return (
     <header className="bg-card border-b border-border px-6 py-4">
       <div className="flex items-center justify-between">
@@ -56,7 +66,7 @@ export function DashboardHeader({ title }: DashboardHeaderProps) {
                 <User className="mr-2 h-4 w-4" />
                 <span>Profile</span>
               </DropdownMenuItem>
-              <DropdownMenuItem>
+              <DropdownMenuItem onClick={handleLogout}>
                 <LogOut className="mr-2 h-4 w-4" />
                 <span>Log out</span>
               </DropdownMenuItem>

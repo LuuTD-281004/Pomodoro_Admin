@@ -10,7 +10,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Badge } from "@/components/ui/badge"
 import { Settings, Bell, Shield, Database, Mail, Save, RefreshCw } from "lucide-react"
 
-export function SettingsTab() {
+export default function SettingsPage() {
   return (
     <div className="space-y-6">
       <div>

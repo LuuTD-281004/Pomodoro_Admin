@@ -23,7 +23,7 @@ import {
 import { Download, TrendingUp, Users, DollarSign, Calendar } from "lucide-react"
 import { useState } from "react"
 
-export function AnalyticsTab() {
+export default function AnalyticsPage() {
   const [timeRange, setTimeRange] = useState("7d")
 
   // Sample data for charts

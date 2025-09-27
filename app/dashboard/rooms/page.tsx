@@ -34,7 +34,7 @@ interface Room {
   createdDate: string
 }
 
-export function RoomsTab() {
+export default function RoomsPage() {
   const [searchTerm, setSearchTerm] = useState("")
   const [isAddDialogOpen, setIsAddDialogOpen] = useState(false)
 

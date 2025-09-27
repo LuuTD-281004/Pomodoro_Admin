@@ -1,25 +1,23 @@
 "use client"
 
 import { useState } from "react"
+import { usePathname } from "next/navigation"
+import Link from "next/link"
 import { Button } from "@/components/ui/button"
 import { cn } from "@/lib/utils"
 import { Users, Home, CreditCard, BarChart3, Settings, ChevronLeft, ChevronRight } from "lucide-react"
 
-interface SidebarProps {
-  activeTab: string
-  onTabChange: (tab: string) => void
-}
-
-export function DashboardSidebar({ activeTab, onTabChange }: SidebarProps) {
+export function DashboardSidebar() {
   const [collapsed, setCollapsed] = useState(false)
+  const pathname = usePathname()
 
   const menuItems = [
-    { id: "overview", label: "Overview", icon: Home },
-    { id: "users", label: "Users", icon: Users },
-    { id: "rooms", label: "Rooms", icon: Home },
-    { id: "transactions", label: "Transactions", icon: CreditCard },
-    { id: "analytics", label: "Analytics", icon: BarChart3 },
-    { id: "settings", label: "Settings", icon: Settings },
+    { id: "overview", label: "Overview", icon: Home, href: "/dashboard/overview" },
+    { id: "users", label: "Users", icon: Users, href: "/dashboard/users" },
+    { id: "rooms", label: "Rooms", icon: Home, href: "/dashboard/rooms" },
+    { id: "transactions", label: "Transactions", icon: CreditCard, href: "/dashboard/transactions" },
+    { id: "analytics", label: "Analytics", icon: BarChart3, href: "/dashboard/analytics" },
+    { id: "settings", label: "Settings", icon: Settings, href: "/dashboard/settings" },
   ]
 
   return (
@@ -45,22 +43,23 @@ export function DashboardSidebar({ activeTab, onTabChange }: SidebarProps) {
         <nav className="flex-1 p-4 space-y-2">
           {menuItems.map((item) => {
             const Icon = item.icon
+            const isActive = pathname === item.href
             return (
-              <Button
-                key={item.id}
-                variant={activeTab === item.id ? "default" : "ghost"}
-                className={cn(
-                  "w-full justify-start gap-3 text-sidebar-foreground",
-                  activeTab === item.id
-                    ? "bg-sidebar-primary text-sidebar-primary-foreground"
-                    : "hover:bg-sidebar-accent hover:text-sidebar-accent-foreground",
-                  collapsed && "px-2",
-                )}
-                onClick={() => onTabChange(item.id)}
-              >
-                <Icon className="h-4 w-4 flex-shrink-0" />
-                {!collapsed && <span>{item.label}</span>}
-              </Button>
+              <Link key={item.id} href={item.href}>
+                <Button
+                  variant={isActive ? "default" : "ghost"}
+                  className={cn(
+                    "w-full justify-start gap-3 text-sidebar-foreground",
+                    isActive
+                      ? "bg-sidebar-primary text-sidebar-primary-foreground"
+                      : "hover:bg-sidebar-accent hover:text-sidebar-accent-foreground",
+                    collapsed && "px-2",
+                  )}
+                >
+                  <Icon className="h-4 w-4 flex-shrink-0" />
+                  {!collapsed && <span>{item.label}</span>}
+                </Button>
+              </Link>
             )
           })}
         </nav>

@@ -1,9 +1,8 @@
 "use client";
 
-import { useRouter } from "next/navigation";
 import { useAuth } from "@/context/auth-context";
-import Link from "next/link";
-import { UserDropdown } from "./user-dropdown";
+import { DashboardSidebar } from "@/components/dashboard-sidebar";
+import { DashboardHeader } from "@/components/dashboard-header";
 
 interface ProtectedLayoutProps {
   children: React.ReactNode;
@@ -27,28 +26,23 @@ export default function ProtectedLayout({
     window.location.href = "/";
   }
 
+  const routeTitles = {
+    "/dashboard": "Dashboard Overview",
+    "/dashboard/overview": "Dashboard Overview",
+    "/dashboard/users": "User Management",
+    "/dashboard/rooms": "Room Management",
+    "/dashboard/transactions": "Transaction Management",
+    "/dashboard/analytics": "Analytics & Reports",
+    "/dashboard/settings": "Settings",
+  };
+
   return (
-    <div className="min-h-screen bg-gray-50 dark:bg-gray-900">
-      <header className="bg-white dark:bg-gray-800 shadow-sm border-b dark:border-gray-700">
-        <div className="container mx-auto px-4 py-4">
-          <div className="flex justify-between items-center">
-            <Link href="/">
-              <h1 className="text-2xl font-bold text-gray-900 dark:text-white">
-                Marketplace
-              </h1>
-              <p className="text-gray-600 dark:text-gray-300">
-                Goods Exchange Application
-              </p>
-            </Link>
-            <div className="flex gap-4">
-              {authenticatedUser && (
-                <UserDropdown user={authenticatedUser} onLogout={logout} />
-              )}
-            </div>
-          </div>
-        </div>
-      </header>
-      {children}
+    <div className="flex h-screen bg-background">
+      <DashboardSidebar />
+      <div className="flex-1 flex flex-col overflow-hidden">
+        <DashboardHeader routeTitles={routeTitles} />
+        <main className="flex-1 overflow-auto p-6">{children}</main>
+      </div>
     </div>
   );
 }

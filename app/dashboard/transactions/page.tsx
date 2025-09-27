@@ -23,7 +23,7 @@ interface Transaction {
   roomName?: string
 }
 
-export function TransactionsTab() {
+export default function TransactionsPage() {
   const [searchTerm, setSearchTerm] = useState("")
   const [statusFilter, setStatusFilter] = useState("all")
   const [typeFilter, setTypeFilter] = useState("all")

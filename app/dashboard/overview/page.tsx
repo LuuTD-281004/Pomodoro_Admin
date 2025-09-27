@@ -3,7 +3,7 @@
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Users, Home, CreditCard, TrendingUp } from "lucide-react"
 
-export function OverviewTab() {
+export default function OverviewPage() {
   const stats = [
     {
       title: "Total Users",
