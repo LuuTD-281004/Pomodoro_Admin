@@ -16,7 +16,7 @@ import {
   TableBody,
   TableCell,
 } from "@/components/ui/table";
-import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar"; // ✅ use shadcn/ui avatar, not radix
+import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar";
 import {
   DropdownMenu,
   DropdownMenuTrigger,
@@ -24,65 +24,44 @@ import {
   DropdownMenuItem,
 } from "@/components/ui/dropdown-menu";
 import { Search, MoreHorizontal, Edit, Trash2 } from "lucide-react";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 
-import type { User } from "@/types/user"; // ✅ import your User type
+import type { User } from "@/types/user";
+import { getAllUsers } from "@/axios/user";
 
 export default function UsersPage() {
   const [searchTerm, setSearchTerm] = useState("");
+  const [users, setUsers] = useState<User[]>([]);
+  const [loading, setLoading] = useState(false);
 
-  const [users] = useState<User[]>([
-    {
-      id: "1",
-      username: "johndoe",
-      email: "john@example.com",
-      isActive: 1,
-      createdAt: "2024-01-15",
-      updatedAt: "2024-02-01",
-      userRoles: [
-        {
-          id: "101",
-          userId: "1",
-          roleId: "1",
-          assignedAt: "2024-01-15",
-          updatedAt: "2024-02-01",
-          role: {
-            id: "1",
-            name: "Admin",
-            createdAt: "2024-01-01",
-            updatedAt: "2024-01-01",
-          },
-        },
-      ],
-    },
-    {
-      id: "2",
-      username: "janesmith",
-      email: "jane@example.com",
-      isActive: 1,
-      createdAt: "2024-02-20",
-      updatedAt: "2024-02-25",
-      userRoles: [
-        {
-          id: "102",
-          userId: "2",
-          roleId: "2",
-          assignedAt: "2024-02-20",
-          updatedAt: "2024-02-25",
-          role: {
-            id: "2",
-            name: "User",
-            createdAt: "2024-01-01",
-            updatedAt: "2024-01-01",
-          },
-        },
-      ],
-    },
-  ]);
+  // pagination + sorting
+  const [page, setPage] = useState(1);
+  const [limit] = useState(10);
+  const [sortBy, setSortBy] = useState("username");
+  const [order, setOrder] = useState<"ASC" | "DESC">("ASC");
 
-  const filteredUsers = users.filter(
+  const [total, setTotal] = useState(0);
+
+  useEffect(() => {
+    const fetchUsers = async () => {
+      setLoading(true);
+      try {
+        const res = await getAllUsers(page, limit, sortBy, order);
+        setUsers(res.data); 
+        setTotal(res.total);
+      } catch (error) {
+        console.error("Failed to fetch users", error);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchUsers();
+  }, [page, limit, sortBy, order]);
+
+  const filteredUsers = users && users.filter && users.filter(
     (user) =>
       user.username.toLowerCase().includes(searchTerm.toLowerCase()) ||
       user.email.toLowerCase().includes(searchTerm.toLowerCase())
@@ -121,83 +100,133 @@ export default function UsersPage() {
           </div>
 
           <div className="rounded-md border">
-            <Table>
-              <TableHeader>
-                <TableRow>
-                  <TableHead>User</TableHead>
-                  <TableHead>Role</TableHead>
-                  <TableHead>Status</TableHead>
-                  <TableHead>Join Date</TableHead>
-                  <TableHead className="text-right">Actions</TableHead>
-                </TableRow>
-              </TableHeader>
-              <TableBody>
-                {filteredUsers.map((user) => (
-                  <TableRow key={user.id}>
-                    <TableCell>
-                      <div className="flex items-center space-x-3">
-                        <Avatar className="h-8 w-8">
-                          <AvatarImage
-                            src="/placeholder.svg"
-                            alt={user.username}
-                          />
-                          <AvatarFallback>
-                            {user.username[0].toUpperCase()}
-                          </AvatarFallback>
-                        </Avatar>
-                        <div>
-                          <div className="font-medium">{user.username}</div>
-                          <div className="text-sm text-muted-foreground">
-                            {user.email}
+            {loading ? (
+              <div className="p-4 text-center">Loading...</div>
+            ) : (
+              <Table>
+                <TableHeader>
+                  <TableRow>
+                    <TableHead
+                      onClick={() => {
+                        setSortBy("username");
+                        setOrder(order === "ASC" ? "DESC" : "ASC");
+                      }}
+                      className="cursor-pointer"
+                    >
+                      User
+                    </TableHead>
+                    <TableHead>Role</TableHead>
+                    <TableHead
+                      onClick={() => {
+                        setSortBy("isActive");
+                        setOrder(order === "ASC" ? "DESC" : "ASC");
+                      }}
+                      className="cursor-pointer"
+                    >
+                      Status
+                    </TableHead>
+                    <TableHead
+                      onClick={() => {
+                        setSortBy("createdAt");
+                        setOrder(order === "ASC" ? "DESC" : "ASC");
+                      }}
+                      className="cursor-pointer"
+                    >
+                      Join Date
+                    </TableHead>
+                    <TableHead className="text-right">Actions</TableHead>
+                  </TableRow>
+                </TableHeader>
+                <TableBody>
+                  {filteredUsers && filteredUsers.map &&filteredUsers.map((user) => (
+                    <TableRow key={user.id}>
+                      <TableCell>
+                        <div className="flex items-center space-x-3">
+                          <Avatar className="h-8 w-8">
+                            <AvatarImage
+                              src="/placeholder.svg"
+                              alt={user.username}
+                            />
+                            <AvatarFallback>
+                              {user.username[0].toUpperCase()}
+                            </AvatarFallback>
+                          </Avatar>
+                          <div>
+                            <div className="font-medium">{user.username}</div>
+                            <div className="text-sm text-muted-foreground">
+                              {user.email}
+                            </div>
                           </div>
                         </div>
-                      </div>
-                    </TableCell>
-                    <TableCell>
-                      <Badge>
-                        {user.userRoles?.[0]?.role?.name || "No Role"}
-                      </Badge>
-                    </TableCell>
-                    <TableCell>
-                      <Badge className={getStatusBadge(user.isActive)}>
-                        {user.isActive === 1
-                          ? "active"
-                          : user.isActive === 0
-                          ? "inactive"
-                          : "pending"}
-                      </Badge>
-                    </TableCell>
-                    <TableCell>
-                      {user.createdAt
-                        ? new Date(user.createdAt).toLocaleDateString()
-                        : "-"}
-                    </TableCell>
-                    <TableCell className="text-right">
-                      <DropdownMenu>
-                        <DropdownMenuTrigger asChild>
-                          <Button variant="ghost" size="icon">
-                            <MoreHorizontal className="h-4 w-4" />
-                          </Button>
-                        </DropdownMenuTrigger>
-                        <DropdownMenuContent align="end">
-                          <DropdownMenuItem>
-                            <Edit className="mr-2 h-4 w-4" />
-                            Edit
-                          </DropdownMenuItem>
-                          <DropdownMenuItem className="text-destructive">
-                            <Trash2 className="mr-2 h-4 w-4" />
-                            Delete
-                          </DropdownMenuItem>
-                        </DropdownMenuContent>
-                      </DropdownMenu>
-                    </TableCell>
-                  </TableRow>
-                ))}
-              </TableBody>
-            </Table>
+                      </TableCell>
+                      <TableCell>
+                        <Badge>
+                          {user.userRoles?.[0]?.role?.name || "No Role"}
+                        </Badge>
+                      </TableCell>
+                      <TableCell>
+                        <Badge className={getStatusBadge(user.isActive)}>
+                          {user.isActive === 1
+                            ? "active"
+                            : user.isActive === 0
+                            ? "inactive"
+                            : "pending"}
+                        </Badge>
+                      </TableCell>
+                      <TableCell>
+                        {user.createdAt
+                          ? new Date(user.createdAt).toLocaleDateString()
+                          : "-"}
+                      </TableCell>
+                      <TableCell className="text-right">
+                        <DropdownMenu>
+                          <DropdownMenuTrigger asChild>
+                            <Button variant="ghost" size="icon">
+                              <MoreHorizontal className="h-4 w-4" />
+                            </Button>
+                          </DropdownMenuTrigger>
+                          <DropdownMenuContent align="end">
+                            <DropdownMenuItem>
+                              <Edit className="mr-2 h-4 w-4" />
+                              Edit
+                            </DropdownMenuItem>
+                            <DropdownMenuItem className="text-destructive">
+                              <Trash2 className="mr-2 h-4 w-4" />
+                              Delete
+                            </DropdownMenuItem>
+                          </DropdownMenuContent>
+                        </DropdownMenu>
+                      </TableCell>
+                    </TableRow>
+                  ))}
+                </TableBody>
+              </Table>
+            )}
+          </div>
+
+          {/* Simple pagination controls */}
+          <div className="flex justify-end items-center space-x-2 mt-4">
+            <Button
+              variant="outline"
+              onClick={() => setPage((p) => Math.max(1, p - 1))}
+              disabled={page === 1}
+            >
+              Previous
+            </Button>
+            <span>
+              Page {page} {total ? `of ${Math.ceil(total / limit)}` : ""}
+            </span>
+            <Button
+              variant="outline"
+              onClick={() => setPage((p) => p + 1)}
+              disabled={total > 0 && page >= Math.ceil(total / limit)}
+            >
+              Next
+            </Button>
           </div>
         </CardContent>
       </Card>
     </div>
   );
 }
+

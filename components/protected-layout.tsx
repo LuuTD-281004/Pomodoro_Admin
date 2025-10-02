@@ -23,7 +23,7 @@ export default function ProtectedLayout({
       );
     }
   } catch (error) {
-    window.location.href = "/";
+
   }
 
   const routeTitles = {
