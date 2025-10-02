@@ -48,9 +48,11 @@ export default function UsersPage() {
     const fetchUsers = async () => {
       setLoading(true);
       try {
-        const res = await getAllUsers(page, limit, sortBy, order);
-        setUsers(res.data); 
-        setTotal(res.total);
+        const response = await getAllUsers(page, limit, sortBy, order);
+        const data = response.result.data;
+        const total = response.result.pagination.total;
+        setUsers(data); 
+        setTotal(total);
       } catch (error) {
         console.error("Failed to fetch users", error);
       } finally {

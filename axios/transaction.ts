@@ -1,16 +1,16 @@
-import { User } from "@/types/user";
+import { Transaction } from "@/types/transaction";
 import http from "./http";
 
-export async function getAllUsers(
+export async function getTransactions(
   page: number = 1,
   limit: number = 10,
-  sortBy: string = "username",
-  order: "ASC" | "DESC" = "ASC"
+  sortBy: string = "transactionDate",
+  order: "ASC" | "DESC" = "DESC"
 ) {
   const response = await http.get<{
     message: string;
     result: {
-      data: User[];
+      data: Transaction[];
       pagination: {
         total: number;
         page: number;
@@ -18,13 +18,8 @@ export async function getAllUsers(
         totalPages: number;
       };
     };
-  }>("/users/all-users", {
-    params: {
-      page,
-      limit,
-      sortBy,
-      order,
-    },
+  }>("/payment/transactions", {
+    params: { page, limit, sortBy, order },
   });
 
   return response.data;
