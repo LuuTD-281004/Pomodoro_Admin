@@ -14,6 +14,7 @@ export type User = {
     provider?: string;
     googleId?: string;
     isActive?: number;
+    userStar: number;
     userRoles?: UserRole[];
     createdAt?: string;
     updatedAt?: string;

@@ -23,7 +23,8 @@ export default function ProtectedLayout({
       );
     }
   } catch (error) {
-
+    console.error("Error parsing roleName:", error);
+    window.location.href = "/";
   }
 
   const routeTitles = {
@@ -34,6 +35,7 @@ export default function ProtectedLayout({
     "/dashboard/transactions": "Transaction Management",
     "/dashboard/analytics": "Analytics & Reports",
     "/dashboard/settings": "Settings",
+    "/dashboard/avatars": "Avatars",
   };
 
   return (

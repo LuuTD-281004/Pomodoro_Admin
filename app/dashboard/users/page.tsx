@@ -118,6 +118,7 @@ export default function UsersPage() {
                       User
                     </TableHead>
                     <TableHead>Role</TableHead>
+                    <TableHead>Star</TableHead>
                     <TableHead
                       onClick={() => {
                         setSortBy("isActive");
@@ -166,6 +167,7 @@ export default function UsersPage() {
                           {user.userRoles?.[0]?.role?.name || "No Role"}
                         </Badge>
                       </TableCell>
+                      <TableCell>{user.userStar || 0}</TableCell>
                       <TableCell>
                         <Badge className={getStatusBadge(user.isActive)}>
                           {user.isActive === 1
