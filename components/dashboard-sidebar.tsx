@@ -42,6 +42,12 @@ export function DashboardSidebar() {
       href: "/dashboard/avatars",
     },
     {
+      id: "backgrounds",
+      label: "Backgrounds",
+      icon: ImageIcon,
+      href: "/dashboard/backgrounds",
+    },
+    {
       id: "analytics",
       label: "Analytics",
       icon: BarChart3,
