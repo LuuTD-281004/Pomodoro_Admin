@@ -33,6 +33,7 @@ interface CloudinaryFile {
 interface Avatar {
   id: string;
   filePath: string;
+  stars: number;
   isPremium: boolean;
   createdAt: string;
   updatedAt: string;
@@ -46,6 +47,7 @@ export default function AvatarsPage() {
   const [isPremium, setIsPremium] = useState(false);
   const [searchQuery, setSearchQuery] = useState("");
   const [showCreateForm, setShowCreateForm] = useState(false);
+  const [stars, setStars] = useState<number>(0);
 
   const fetchCloudinaryFiles = async () => {
     try {
@@ -69,7 +71,6 @@ export default function AvatarsPage() {
 
   const fetchAvatars = async () => {
     try {
-      // Replace with your actual API endpoint
       const response = await getAvatars();
       setAvatars(response.result || []);
     } catch (error) {
@@ -87,7 +88,11 @@ export default function AvatarsPage() {
     if (!selectedFile) return;
 
     try {
-      const response = await createAvatar(selectedFile.secure_url, isPremium);
+      const response = await createAvatar(
+        selectedFile.secure_url,
+        isPremium,
+        stars
+      );
       setAvatars([...avatars, response.data.result]);
       setSelectedFile(null);
       setIsPremium(false);
@@ -225,6 +230,23 @@ export default function AvatarsPage() {
                   />
                 </div>
 
+                <div className="space-y-1">
+                  <Label htmlFor="price" className="text-card-foreground">
+                    Stars
+                  </Label>
+                  <Input
+                    id="price"
+                    type="number"
+                    min="0"
+                    placeholder="Enter stars"
+                    value={stars}
+                    onChange={(e) => setStars(parseInt(e.target.value))}
+                  />
+                  <p className="text-xs text-muted-foreground">
+                    Set a price for this premium avatar (in USD)
+                  </p>
+                </div>
+
                 <div className="flex gap-2">
                   <Button onClick={handleCreateAvatar} className="flex-1">
                     Create Avatar Entity
@@ -235,6 +257,7 @@ export default function AvatarsPage() {
                       setSelectedFile(null);
                       setIsPremium(false);
                       setShowCreateForm(false);
+                      setStars(0);
                     }}
                   >
                     Cancel
@@ -289,6 +312,7 @@ export default function AvatarsPage() {
                         Created:{" "}
                         {new Date(avatar.createdAt).toLocaleDateString()}
                       </p>
+                      <p>Stars: {avatar.stars}</p>
                     </div>
                     <Button
                       variant="destructive"

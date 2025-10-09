@@ -3,6 +3,7 @@
 import { useAuth } from "@/context/auth-context";
 import { DashboardSidebar } from "@/components/dashboard-sidebar";
 import { DashboardHeader } from "@/components/dashboard-header";
+import { useRouter } from "next/navigation";
 
 interface ProtectedLayoutProps {
   children: React.ReactNode;
@@ -13,10 +14,11 @@ export default function ProtectedLayout({
   children,
   allowedRole,
 }: ProtectedLayoutProps) {
-  const { authenticatedUser, logout } = useAuth();
+  const { authenticatedUser } = useAuth();
+  const router = useRouter();
 
   try {
-    const roleArray = JSON.parse(authenticatedUser?.roleName || "");
+    const roleArray = JSON.parse(authenticatedUser?.roleName || "[]");
     if (!roleArray.includes(allowedRole)) {
       console.warn(
         "ProtectedLayout: Unauthorized access, redirecting to home."
@@ -24,7 +26,7 @@ export default function ProtectedLayout({
     }
   } catch (error) {
     console.error("Error parsing roleName:", error);
-    window.location.href = "/";
+    router.push("/");
   }
 
   const routeTitles = {
