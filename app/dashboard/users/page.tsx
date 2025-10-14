@@ -44,30 +44,33 @@ export default function UsersPage() {
 
   const [total, setTotal] = useState(0);
 
-  useEffect(() => {
-    const fetchUsers = async () => {
-      setLoading(true);
-      try {
-        const response = await getAllUsers(page, limit, sortBy, order);
-        const data = response.result.data;
-        const total = response.result.pagination.total;
-        setUsers(data); 
-        setTotal(total);
-      } catch (error) {
-        console.error("Failed to fetch users", error);
-      } finally {
-        setLoading(false);
-      }
-    };
+  const fetchUsers = async () => {
+    setLoading(true);
+    try {
+      const response = await getAllUsers(page, limit, sortBy, order);
+      const data = response.result.data;
+      const total = response.result.pagination.total;
+      setUsers(data);
+      setTotal(total);
+    } catch (error) {
+      console.error("Failed to fetch users", error);
+    } finally {
+      setLoading(false);
+    }
+  };
 
+  useEffect(() => {
     fetchUsers();
   }, [page, limit, sortBy, order]);
 
-  const filteredUsers = users && users.filter && users.filter(
-    (user) =>
-      user.username.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      user.email.toLowerCase().includes(searchTerm.toLowerCase())
-  );
+  const filteredUsers =
+    users &&
+    users.filter &&
+    users.filter(
+      (user) =>
+        user.username.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        user.email.toLowerCase().includes(searchTerm.toLowerCase())
+    );
 
   const getStatusBadge = (isActive?: number) => {
     if (isActive === 1) return "bg-green-100 text-green-700 border-green-200";
@@ -141,68 +144,70 @@ export default function UsersPage() {
                   </TableRow>
                 </TableHeader>
                 <TableBody>
-                  {filteredUsers && filteredUsers.map &&filteredUsers.map((user) => (
-                    <TableRow key={user.id}>
-                      <TableCell>
-                        <div className="flex items-center space-x-3">
-                          <Avatar className="h-8 w-8">
-                            <AvatarImage
-                              src="/placeholder.svg"
-                              alt={user.username}
-                            />
-                            <AvatarFallback>
-                              {user.username[0].toUpperCase()}
-                            </AvatarFallback>
-                          </Avatar>
-                          <div>
-                            <div className="font-medium">{user.username}</div>
-                            <div className="text-sm text-muted-foreground">
-                              {user.email}
+                  {filteredUsers &&
+                    filteredUsers.map &&
+                    filteredUsers.map((user) => (
+                      <TableRow key={user.id}>
+                        <TableCell>
+                          <div className="flex items-center space-x-3">
+                            <Avatar className="h-8 w-8">
+                              <AvatarImage
+                                src="/placeholder.svg"
+                                alt={user.username}
+                              />
+                              <AvatarFallback>
+                                {user.username[0].toUpperCase()}
+                              </AvatarFallback>
+                            </Avatar>
+                            <div>
+                              <div className="font-medium">{user.username}</div>
+                              <div className="text-sm text-muted-foreground">
+                                {user.email}
+                              </div>
                             </div>
                           </div>
-                        </div>
-                      </TableCell>
-                      <TableCell>
-                        <Badge>
-                          {user.userRoles?.[0]?.role?.name || "No Role"}
-                        </Badge>
-                      </TableCell>
-                      <TableCell>{user.userStar || 0}</TableCell>
-                      <TableCell>
-                        <Badge className={getStatusBadge(user.isActive)}>
-                          {user.isActive === 1
-                            ? "active"
-                            : user.isActive === 0
-                            ? "inactive"
-                            : "pending"}
-                        </Badge>
-                      </TableCell>
-                      <TableCell>
-                        {user.createdAt
-                          ? new Date(user.createdAt).toLocaleDateString()
-                          : "-"}
-                      </TableCell>
-                      <TableCell className="text-right">
-                        <DropdownMenu>
-                          <DropdownMenuTrigger asChild>
-                            <Button variant="ghost" size="icon">
-                              <MoreHorizontal className="h-4 w-4" />
-                            </Button>
-                          </DropdownMenuTrigger>
-                          <DropdownMenuContent align="end">
-                            <DropdownMenuItem>
-                              <Edit className="mr-2 h-4 w-4" />
-                              Edit
-                            </DropdownMenuItem>
-                            <DropdownMenuItem className="text-destructive">
-                              <Trash2 className="mr-2 h-4 w-4" />
-                              Delete
-                            </DropdownMenuItem>
-                          </DropdownMenuContent>
-                        </DropdownMenu>
-                      </TableCell>
-                    </TableRow>
-                  ))}
+                        </TableCell>
+                        <TableCell>
+                          <Badge>
+                            {user.userRoles?.[0]?.role?.name || "No Role"}
+                          </Badge>
+                        </TableCell>
+                        <TableCell>{user.userStar || 0}</TableCell>
+                        <TableCell>
+                          <Badge className={getStatusBadge(user.isActive)}>
+                            {user.isActive === 1
+                              ? "active"
+                              : user.isActive === 0
+                              ? "inactive"
+                              : "pending"}
+                          </Badge>
+                        </TableCell>
+                        <TableCell>
+                          {user.createdAt
+                            ? new Date(user.createdAt).toLocaleDateString()
+                            : "-"}
+                        </TableCell>
+                        <TableCell className="text-right">
+                          <DropdownMenu>
+                            <DropdownMenuTrigger asChild>
+                              <Button variant="ghost" size="icon">
+                                <MoreHorizontal className="h-4 w-4" />
+                              </Button>
+                            </DropdownMenuTrigger>
+                            <DropdownMenuContent align="end">
+                              <DropdownMenuItem>
+                                <Edit className="mr-2 h-4 w-4" />
+                                Edit
+                              </DropdownMenuItem>
+                              <DropdownMenuItem className="text-destructive">
+                                <Trash2 className="mr-2 h-4 w-4" />
+                                Delete
+                              </DropdownMenuItem>
+                            </DropdownMenuContent>
+                          </DropdownMenu>
+                        </TableCell>
+                      </TableRow>
+                    ))}
                 </TableBody>
               </Table>
             )}
@@ -233,4 +238,3 @@ export default function UsersPage() {
     </div>
   );
 }
-

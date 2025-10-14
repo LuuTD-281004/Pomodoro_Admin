@@ -1,125 +1,249 @@
-"use client"
+"use client";
 
-import { useState } from "react"
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
-import { Button } from "@/components/ui/button"
-import { Input } from "@/components/ui/input"
-import { Badge } from "@/components/ui/badge"
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table"
+import { useState } from "react";
 import {
-  Dialog,
-  DialogContent,
-  DialogDescription,
-  DialogFooter,
-  DialogHeader,
-  DialogTitle,
-  DialogTrigger,
-} from "@/components/ui/dialog"
-import { Label } from "@/components/ui/label"
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
-import { Textarea } from "@/components/ui/textarea"
-import { Search, Plus, Edit, Trash2, MoreHorizontal, Users, MapPin } from "lucide-react"
-import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu"
-
-interface Room {
-  id: string
-  name: string
-  type: string
-  capacity: number
-  currentOccupancy: number
-  status: "available" | "occupied" | "maintenance" | "reserved"
-  location: string
-  price: number
-  description: string
-  createdDate: string
-}
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Badge } from "@/components/ui/badge";
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from "@/components/ui/table";
+import {
+  Search,
+  Edit,
+  Trash2,
+  MoreHorizontal,
+  Users,
+  Clock,
+  User,
+  ChevronLeft,
+  ChevronRight,
+  ArrowUpDown,
+  ArrowDown,
+  ArrowUp,
+} from "lucide-react";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
+import { GroupRoom, PersonalRoom } from "@/types/room";
+import { Tabs, TabsList, TabsTrigger, TabsContent } from "@radix-ui/react-tabs";
 
 export default function RoomsPage() {
-  const [searchTerm, setSearchTerm] = useState("")
-  const [isAddDialogOpen, setIsAddDialogOpen] = useState(false)
+  const [searchTerm, setSearchTerm] = useState("");
 
-  const [rooms] = useState<Room[]>([
+  const [personalSortBy, setPersonalSortBy] = useState("createdAt")
+  const [personalOrder, setPersonalOrder] = useState<"ASC" | "DESC">("DESC")
+
+  const [personalPage, setPersonalPage] = useState(1)
+  const [personalPagination, setPersonalPagination] = useState({
+    total: 23,
+    page: 1,
+    limit: 10,
+    totalPages: 3,
+  })
+
+  const [groupSortBy, setGroupSortBy] = useState("createdAt")
+  const [groupOrder, setGroupOrder] = useState<"ASC" | "DESC">("DESC")
+
+  const [groupPage, setGroupPage] = useState(1)
+  const [groupPagination, setGroupPagination] = useState({
+    total: 18,
+    page: 1,
+    limit: 10,
+    totalPages: 2,
+  })
+
+  const [personalRooms] = useState<PersonalRoom[]>([
     {
       id: "1",
-      name: "Conference Room A",
-      type: "Meeting Room",
-      capacity: 12,
-      currentOccupancy: 8,
-      status: "occupied",
-      location: "Floor 2, East Wing",
-      price: 50,
-      description: "Large conference room with projector and whiteboard",
-      createdDate: "2024-01-15",
+      roomStatus: 1,
+      focusTime: 25,
+      userId: "user-123",
+      loopCount: 4,
+      shortRestTime: 5,
+      longRestTime: 15,
+      endAt: null,
+      createdAt: "2024-01-15T10:00:00Z",
+      updatedAt: "2024-01-15T10:00:00Z",
     },
     {
       id: "2",
-      name: "Study Room 101",
-      type: "Study Room",
-      capacity: 4,
-      currentOccupancy: 0,
-      status: "available",
-      location: "Floor 1, Library",
-      price: 15,
-      description: "Quiet study room perfect for small groups",
-      createdDate: "2024-01-20",
+      roomStatus: 2,
+      focusTime: 50,
+      userId: "user-456",
+      loopCount: 3,
+      shortRestTime: 10,
+      longRestTime: 20,
+      endAt: "2024-03-20T15:30:00Z",
+      createdAt: "2024-01-20T14:00:00Z",
+      updatedAt: "2024-01-20T14:00:00Z",
     },
     {
       id: "3",
-      name: "Auditorium",
-      type: "Event Space",
-      capacity: 200,
-      currentOccupancy: 0,
-      status: "maintenance",
-      location: "Ground Floor",
-      price: 200,
-      description: "Large auditorium for presentations and events",
-      createdDate: "2024-01-10",
-    },
-    {
-      id: "4",
-      name: "Workshop Room B",
-      type: "Workshop",
-      capacity: 20,
-      currentOccupancy: 0,
-      status: "reserved",
-      location: "Floor 3, West Wing",
-      price: 75,
-      description: "Hands-on workshop room with tools and equipment",
-      createdDate: "2024-02-01",
-    },
-    {
-      id: "5",
-      name: "Private Office 205",
-      type: "Office",
-      capacity: 2,
-      currentOccupancy: 1,
-      status: "occupied",
-      location: "Floor 2, North Wing",
-      price: 30,
-      description: "Private office space for focused work",
-      createdDate: "2024-02-15",
+      roomStatus: 0,
+      focusTime: 30,
+      userId: "user-789",
+      loopCount: 5,
+      shortRestTime: 5,
+      longRestTime: 15,
+      endAt: null,
+      createdAt: "2024-02-01T09:00:00Z",
+      updatedAt: "2024-02-01T09:00:00Z",
     },
   ])
 
-  const filteredRooms = rooms.filter(
+  const [groupRooms] = useState<GroupRoom[]>([
+    {
+      id: "1",
+      roomType: 1,
+      roomStatus: 1,
+      loopCount: 4,
+      roomName: "Study Group A",
+      focusTime: 25,
+      shortRestTime: 5,
+      longRestTime: 15,
+      roomCode: "STUDY123",
+      endAt: null,
+      participantCount: 8,
+      messageCount: 45,
+      createdAt: new Date("2024-01-15T10:00:00Z"),
+      updatedAt: new Date("2024-01-15T10:00:00Z"),
+    },
+    {
+      id: "2",
+      roomType: 2,
+      roomStatus: 2,
+      loopCount: 3,
+      roomName: "Team Focus Room",
+      focusTime: 50,
+      shortRestTime: 10,
+      longRestTime: 20,
+      roomCode: "TEAM456",
+      endAt: new Date("2024-03-20T15:30:00Z"),
+      participantCount: 12,
+      messageCount: 89,
+      createdAt: new Date("2024-01-20T14:00:00Z"),
+      updatedAt: new Date("2024-01-20T14:00:00Z"),
+    },
+    {
+      id: "3",
+      roomType: 1,
+      roomStatus: 0,
+      loopCount: 5,
+      roomName: "Productivity Hub",
+      focusTime: 30,
+      shortRestTime: 5,
+      longRestTime: 15,
+      roomCode: "PROD789",
+      endAt: null,
+      participantCount: 5,
+      messageCount: 23,
+      createdAt: new Date("2024-02-01T09:00:00Z"),
+      updatedAt: new Date("2024-02-01T09:00:00Z"),
+    },
+  ])
+
+  const filteredPersonalRooms = personalRooms.filter(
     (room) =>
-      room.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      room.type.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      room.location.toLowerCase().includes(searchTerm.toLowerCase()),
+      room.userId.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      room.id.toLowerCase().includes(searchTerm.toLowerCase()),
   )
 
-  const getStatusBadge = (status: Room["status"]) => {
-    const variants = {
-      available: "bg-chart-3/20 text-chart-3 border-chart-3/30",
-      occupied: "bg-chart-4/20 text-chart-4 border-chart-4/30",
-      maintenance: "bg-destructive/20 text-destructive border-destructive/30",
-      reserved: "bg-chart-1/20 text-chart-1 border-chart-1/30",
+  const filteredGroupRooms = groupRooms.filter(
+    (room) =>
+      room.roomName.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      room.roomCode.toLowerCase().includes(searchTerm.toLowerCase()),
+  )
+
+  const handlePersonalSort = (column: string) => {
+    if (personalSortBy === column) {
+      // Toggle order if same column
+      setPersonalOrder(personalOrder === "ASC" ? "DESC" : "ASC")
+    } else {
+      // Set new column and default to ASC
+      setPersonalSortBy(column)
+      setPersonalOrder("ASC")
     }
-    return variants[status]
+    // TODO: Fetch data from backend with new sort parameters
+    // Example: fetchPersonalRooms({ page: personalPage, limit: personalLimit, sortBy: column, order: newOrder })
   }
 
-  const getOccupancyPercentage = (current: number, capacity: number) => {
-    return Math.round((current / capacity) * 100)
+  const handleGroupSort = (column: string) => {
+    if (groupSortBy === column) {
+      // Toggle order if same column
+      setGroupOrder(groupOrder === "ASC" ? "DESC" : "ASC")
+    } else {
+      // Set new column and default to ASC
+      setGroupSortBy(column)
+      setGroupOrder("ASC")
+    }
+    // TODO: Fetch data from backend with new sort parameters
+    // Example: fetchGroupRooms({ page: groupPage, limit: groupLimit, sortBy: column, order: newOrder })
+  }
+
+  const handlePersonalPageChange = (newPage: number) => {
+    setPersonalPage(newPage)
+    // TODO: Fetch data from backend with new page
+    // Example: fetchPersonalRooms({ page: newPage, limit: personalLimit, search: searchTerm, sortBy: personalSortBy, order: personalOrder })
+  }
+
+  const handleGroupPageChange = (newPage: number) => {
+    setGroupPage(newPage)
+    // TODO: Fetch data from backend with new page
+    // Example: fetchGroupRooms({ page: newPage, limit: groupLimit, search: searchTerm, sortBy: groupSortBy, order: groupOrder })
+  }
+
+  const getRoomStatusBadge = (status: number) => {
+    const statusMap = {
+      0: { label: "Idle", class: "bg-muted/20 text-muted-foreground border-muted" },
+      1: { label: "Active", class: "bg-chart-3/20 text-chart-3 border-chart-3/30" },
+      2: { label: "Completed", class: "bg-chart-1/20 text-chart-1 border-chart-1/30" },
+    }
+    return statusMap[status as keyof typeof statusMap] || statusMap[0]
+  }
+
+  const getRoomTypeBadge = (type: number) => {
+    const typeMap = {
+      1: { label: "Focus", class: "bg-chart-2/20 text-chart-2 border-chart-2/30" },
+      2: { label: "Collaboration", class: "bg-chart-4/20 text-chart-4 border-chart-4/30" },
+    }
+    return typeMap[type as keyof typeof typeMap] || typeMap[1]
+  }
+
+  const formatDate = (date: string | Date | null) => {
+    if (!date) return "N/A"
+    return new Date(date).toLocaleDateString("en-US", {
+      year: "numeric",
+      month: "short",
+      day: "numeric",
+      hour: "2-digit",
+      minute: "2-digit",
+    })
+  }
+
+  const renderSortIcon = (column: string, currentSortBy: string, currentOrder: "ASC" | "DESC") => {
+    if (column !== currentSortBy) {
+      return <ArrowUpDown className="ml-1 h-3 w-3 inline" />
+    }
+    return currentOrder === "ASC" ? (
+      <ArrowUp className="ml-1 h-3 w-3 inline" />
+    ) : (
+      <ArrowDown className="ml-1 h-3 w-3 inline" />
+    )
   }
 
   return (
@@ -127,246 +251,395 @@ export default function RoomsPage() {
       <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
         <Card className="bg-card border-border">
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium text-card-foreground">Total Rooms</CardTitle>
-            <MapPin className="h-4 w-4 text-chart-1" />
+            <CardTitle className="text-sm font-medium text-card-foreground">Personal Rooms</CardTitle>
+            <User className="h-4 w-4 text-chart-1" />
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold text-card-foreground">{rooms.length}</div>
-            <p className="text-xs text-muted-foreground">Across all locations</p>
+            <div className="text-2xl font-bold text-card-foreground">{personalRooms.length}</div>
+            <p className="text-xs text-muted-foreground">Individual focus sessions</p>
           </CardContent>
         </Card>
 
         <Card className="bg-card border-border">
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium text-card-foreground">Available</CardTitle>
+            <CardTitle className="text-sm font-medium text-card-foreground">Group Rooms</CardTitle>
+            <Users className="h-4 w-4 text-chart-2" />
+          </CardHeader>
+          <CardContent>
+            <div className="text-2xl font-bold text-card-foreground">{groupRooms.length}</div>
+            <p className="text-xs text-muted-foreground">Collaborative sessions</p>
+          </CardContent>
+        </Card>
+
+        <Card className="bg-card border-border">
+          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+            <CardTitle className="text-sm font-medium text-card-foreground">Active Rooms</CardTitle>
             <div className="h-4 w-4 rounded-full bg-chart-3"></div>
           </CardHeader>
           <CardContent>
             <div className="text-2xl font-bold text-card-foreground">
-              {rooms.filter((r) => r.status === "available").length}
+              {personalRooms.filter((r) => r.roomStatus === 1).length +
+                groupRooms.filter((r) => r.roomStatus === 1).length}
             </div>
-            <p className="text-xs text-muted-foreground">Ready for booking</p>
+            <p className="text-xs text-muted-foreground">Currently running</p>
           </CardContent>
         </Card>
 
         <Card className="bg-card border-border">
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium text-card-foreground">Occupied</CardTitle>
-            <div className="h-4 w-4 rounded-full bg-chart-4"></div>
+            <CardTitle className="text-sm font-medium text-card-foreground">Total Participants</CardTitle>
+            <Users className="h-4 w-4 text-chart-4" />
           </CardHeader>
           <CardContent>
             <div className="text-2xl font-bold text-card-foreground">
-              {rooms.filter((r) => r.status === "occupied").length}
+              {groupRooms.reduce((sum, room) => sum + room.participantCount, 0)}
             </div>
-            <p className="text-xs text-muted-foreground">Currently in use</p>
-          </CardContent>
-        </Card>
-
-        <Card className="bg-card border-border">
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium text-card-foreground">Total Capacity</CardTitle>
-            <Users className="h-4 w-4 text-chart-2" />
-          </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold text-card-foreground">
-              {rooms.reduce((sum, room) => sum + room.capacity, 0)}
-            </div>
-            <p className="text-xs text-muted-foreground">Maximum occupancy</p>
+            <p className="text-xs text-muted-foreground">In group rooms</p>
           </CardContent>
         </Card>
       </div>
 
       <Card className="bg-card border-border">
         <CardHeader>
-          <div className="flex items-center justify-between">
-            <div>
-              <CardTitle className="text-card-foreground">Room Management</CardTitle>
-              <CardDescription className="text-muted-foreground">Manage room availability and bookings</CardDescription>
-            </div>
-            <Dialog open={isAddDialogOpen} onOpenChange={setIsAddDialogOpen}>
-              <DialogTrigger asChild>
-                <Button className="bg-primary text-primary-foreground hover:bg-primary/90">
-                  <Plus className="mr-2 h-4 w-4" />
-                  Add Room
-                </Button>
-              </DialogTrigger>
-              <DialogContent className="bg-card border-border max-w-2xl">
-                <DialogHeader>
-                  <DialogTitle className="text-card-foreground">Add New Room</DialogTitle>
-                  <DialogDescription className="text-muted-foreground">
-                    Create a new room with the specified details and configuration.
-                  </DialogDescription>
-                </DialogHeader>
-                <div className="grid gap-4 py-4">
-                  <div className="grid grid-cols-4 items-center gap-4">
-                    <Label htmlFor="room-name" className="text-right text-card-foreground">
-                      Name
-                    </Label>
-                    <Input
-                      id="room-name"
-                      placeholder="Enter room name"
-                      className="col-span-3 bg-background border-border"
-                    />
-                  </div>
-                  <div className="grid grid-cols-4 items-center gap-4">
-                    <Label htmlFor="room-type" className="text-right text-card-foreground">
-                      Type
-                    </Label>
-                    <Select>
-                      <SelectTrigger className="col-span-3 bg-background border-border">
-                        <SelectValue placeholder="Select room type" />
-                      </SelectTrigger>
-                      <SelectContent>
-                        <SelectItem value="meeting">Meeting Room</SelectItem>
-                        <SelectItem value="study">Study Room</SelectItem>
-                        <SelectItem value="event">Event Space</SelectItem>
-                        <SelectItem value="workshop">Workshop</SelectItem>
-                        <SelectItem value="office">Office</SelectItem>
-                      </SelectContent>
-                    </Select>
-                  </div>
-                  <div className="grid grid-cols-4 items-center gap-4">
-                    <Label htmlFor="capacity" className="text-right text-card-foreground">
-                      Capacity
-                    </Label>
-                    <Input
-                      id="capacity"
-                      type="number"
-                      placeholder="Maximum occupancy"
-                      className="col-span-3 bg-background border-border"
-                    />
-                  </div>
-                  <div className="grid grid-cols-4 items-center gap-4">
-                    <Label htmlFor="location" className="text-right text-card-foreground">
-                      Location
-                    </Label>
-                    <Input
-                      id="location"
-                      placeholder="Floor and wing details"
-                      className="col-span-3 bg-background border-border"
-                    />
-                  </div>
-                  <div className="grid grid-cols-4 items-center gap-4">
-                    <Label htmlFor="price" className="text-right text-card-foreground">
-                      Price/Hour
-                    </Label>
-                    <Input
-                      id="price"
-                      type="number"
-                      placeholder="Hourly rate"
-                      className="col-span-3 bg-background border-border"
-                    />
-                  </div>
-                  <div className="grid grid-cols-4 items-center gap-4">
-                    <Label htmlFor="description" className="text-right text-card-foreground">
-                      Description
-                    </Label>
-                    <Textarea
-                      id="description"
-                      placeholder="Room features and amenities"
-                      className="col-span-3 bg-background border-border"
-                    />
-                  </div>
-                </div>
-                <DialogFooter>
-                  <Button type="submit" className="bg-primary text-primary-foreground hover:bg-primary/90">
-                    Create Room
-                  </Button>
-                </DialogFooter>
-              </DialogContent>
-            </Dialog>
-          </div>
+          <CardTitle className="text-card-foreground">Room Management</CardTitle>
+          <CardDescription className="text-muted-foreground">Manage personal and group focus rooms</CardDescription>
         </CardHeader>
         <CardContent>
-          <div className="flex items-center space-x-2 mb-4">
-            <div className="relative flex-1">
-              <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-muted-foreground h-4 w-4" />
-              <Input
-                placeholder="Search rooms..."
-                value={searchTerm}
-                onChange={(e) => setSearchTerm(e.target.value)}
-                className="pl-10 bg-background border-border"
-              />
-            </div>
-          </div>
+          <Tabs defaultValue="personal" className="w-full">
+            <TabsList className="grid w-full grid-cols-2 mb-4">
+              <TabsTrigger value="personal">Personal Rooms</TabsTrigger>
+              <TabsTrigger value="group">Group Rooms</TabsTrigger>
+            </TabsList>
 
-          <div className="rounded-md border border-border">
-            <Table>
-              <TableHeader>
-                <TableRow className="border-border hover:bg-muted/50">
-                  <TableHead className="text-muted-foreground">Room</TableHead>
-                  <TableHead className="text-muted-foreground">Type</TableHead>
-                  <TableHead className="text-muted-foreground">Capacity</TableHead>
-                  <TableHead className="text-muted-foreground">Status</TableHead>
-                  <TableHead className="text-muted-foreground">Price/Hour</TableHead>
-                  <TableHead className="text-right text-muted-foreground">Actions</TableHead>
-                </TableRow>
-              </TableHeader>
-              <TableBody>
-                {filteredRooms.map((room) => (
-                  <TableRow key={room.id} className="border-border hover:bg-muted/50">
-                    <TableCell className="font-medium">
-                      <div>
-                        <div className="font-medium text-card-foreground">{room.name}</div>
-                        <div className="text-sm text-muted-foreground flex items-center">
-                          <MapPin className="h-3 w-3 mr-1" />
-                          {room.location}
-                        </div>
-                      </div>
-                    </TableCell>
-                    <TableCell>
-                      <Badge variant="outline" className="border-border text-card-foreground">
-                        {room.type}
-                      </Badge>
-                    </TableCell>
-                    <TableCell>
-                      <div className="flex items-center space-x-2">
-                        <Users className="h-4 w-4 text-muted-foreground" />
-                        <span className="text-card-foreground">
-                          {room.currentOccupancy}/{room.capacity}
-                        </span>
-                        <span className="text-xs text-muted-foreground">
-                          ({getOccupancyPercentage(room.currentOccupancy, room.capacity)}%)
-                        </span>
-                      </div>
-                    </TableCell>
-                    <TableCell>
-                      <Badge variant="outline" className={getStatusBadge(room.status)}>
-                        {room.status}
-                      </Badge>
-                    </TableCell>
-                    <TableCell className="text-card-foreground">${room.price}</TableCell>
-                    <TableCell className="text-right">
-                      <DropdownMenu>
-                        <DropdownMenuTrigger asChild>
-                          <Button
-                            variant="ghost"
-                            className="h-8 w-8 p-0 text-muted-foreground hover:text-card-foreground"
-                          >
-                            <MoreHorizontal className="h-4 w-4" />
-                          </Button>
-                        </DropdownMenuTrigger>
-                        <DropdownMenuContent align="end" className="bg-card border-border">
-                          <DropdownMenuItem className="text-card-foreground hover:bg-muted">
-                            <Edit className="mr-2 h-4 w-4" />
-                            Edit
-                          </DropdownMenuItem>
-                          <DropdownMenuItem className="text-card-foreground hover:bg-muted">
-                            <Users className="mr-2 h-4 w-4" />
-                            View Bookings
-                          </DropdownMenuItem>
-                          <DropdownMenuItem className="text-destructive hover:bg-destructive/10">
-                            <Trash2 className="mr-2 h-4 w-4" />
-                            Delete
-                          </DropdownMenuItem>
-                        </DropdownMenuContent>
-                      </DropdownMenu>
-                    </TableCell>
-                  </TableRow>
-                ))}
-              </TableBody>
-            </Table>
-          </div>
+            {/* Personal Rooms Tab */}
+            <TabsContent value="personal" className="space-y-4">
+              <div className="flex items-center justify-between">
+                <div className="relative flex-1 max-w-sm">
+                  <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-muted-foreground h-4 w-4" />
+                  <Input
+                    placeholder="Search by user ID..."
+                    value={searchTerm}
+                    onChange={(e) => setSearchTerm(e.target.value)}
+                    className="pl-10 bg-background border-border"
+                  />
+                </div>
+              </div>
+
+              <div className="rounded-md border border-border">
+                <Table>
+                  <TableHeader>
+                    <TableRow className="border-border hover:bg-muted/50">
+                      <TableHead
+                        className="text-muted-foreground cursor-pointer hover:text-card-foreground"
+                        onClick={() => handlePersonalSort("id")}
+                      >
+                        Room ID {renderSortIcon("id", personalSortBy, personalOrder)}
+                      </TableHead>
+                      <TableHead
+                        className="text-muted-foreground cursor-pointer hover:text-card-foreground"
+                        onClick={() => handlePersonalSort("userId")}
+                      >
+                        User ID {renderSortIcon("userId", personalSortBy, personalOrder)}
+                      </TableHead>
+                      <TableHead
+                        className="text-muted-foreground cursor-pointer hover:text-card-foreground"
+                        onClick={() => handlePersonalSort("focusTime")}
+                      >
+                        Focus Time {renderSortIcon("focusTime", personalSortBy, personalOrder)}
+                      </TableHead>
+                      <TableHead className="text-muted-foreground">Rest Times</TableHead>
+                      <TableHead
+                        className="text-muted-foreground cursor-pointer hover:text-card-foreground"
+                        onClick={() => handlePersonalSort("loopCount")}
+                      >
+                        Loops {renderSortIcon("loopCount", personalSortBy, personalOrder)}
+                      </TableHead>
+                      <TableHead
+                        className="text-muted-foreground cursor-pointer hover:text-card-foreground"
+                        onClick={() => handlePersonalSort("roomStatus")}
+                      >
+                        Status {renderSortIcon("roomStatus", personalSortBy, personalOrder)}
+                      </TableHead>
+                      <TableHead
+                        className="text-muted-foreground cursor-pointer hover:text-card-foreground"
+                        onClick={() => handlePersonalSort("endAt")}
+                      >
+                        End At {renderSortIcon("endAt", personalSortBy, personalOrder)}
+                      </TableHead>
+                      <TableHead className="text-right text-muted-foreground">Actions</TableHead>
+                    </TableRow>
+                  </TableHeader>
+                  <TableBody>
+                    {filteredPersonalRooms.map((room) => {
+                      const status = getRoomStatusBadge(room.roomStatus)
+                      return (
+                        <TableRow key={room.id} className="border-border hover:bg-muted/50">
+                          <TableCell className="font-medium text-card-foreground">{room.id}</TableCell>
+                          <TableCell className="text-card-foreground">{room.userId}</TableCell>
+                          <TableCell>
+                            <div className="flex items-center space-x-1">
+                              <Clock className="h-3 w-3 text-muted-foreground" />
+                              <span className="text-card-foreground">{room.focusTime}m</span>
+                            </div>
+                          </TableCell>
+                          <TableCell className="text-card-foreground">
+                            {room.shortRestTime}m / {room.longRestTime}m
+                          </TableCell>
+                          <TableCell className="text-card-foreground">{room.loopCount}</TableCell>
+                          <TableCell>
+                            <Badge variant="outline" className={status.class}>
+                              {status.label}
+                            </Badge>
+                          </TableCell>
+                          <TableCell className="text-card-foreground text-sm">{formatDate(room.endAt)}</TableCell>
+                          <TableCell className="text-right">
+                            <DropdownMenu>
+                              <DropdownMenuTrigger asChild>
+                                <Button
+                                  variant="ghost"
+                                  className="h-8 w-8 p-0 text-muted-foreground hover:text-card-foreground"
+                                >
+                                  <MoreHorizontal className="h-4 w-4" />
+                                </Button>
+                              </DropdownMenuTrigger>
+                              <DropdownMenuContent align="end" className="bg-card border-border">
+                                <DropdownMenuItem className="text-card-foreground hover:bg-muted">
+                                  <Edit className="mr-2 h-4 w-4" />
+                                  Edit
+                                </DropdownMenuItem>
+                                <DropdownMenuItem className="text-destructive hover:bg-destructive/10">
+                                  <Trash2 className="mr-2 h-4 w-4" />
+                                  Delete
+                                </DropdownMenuItem>
+                              </DropdownMenuContent>
+                            </DropdownMenu>
+                          </TableCell>
+                        </TableRow>
+                      )
+                    })}
+                  </TableBody>
+                </Table>
+              </div>
+
+              <div className="flex items-center justify-between px-2">
+                <div className="text-sm text-muted-foreground">
+                  Showing {(personalPagination.page - 1) * personalPagination.limit + 1} to{" "}
+                  {Math.min(personalPagination.page * personalPagination.limit, personalPagination.total)} of{" "}
+                  {personalPagination.total} results
+                </div>
+                <div className="flex items-center space-x-2">
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    onClick={() => handlePersonalPageChange(personalPage - 1)}
+                    disabled={personalPage === 1}
+                    className="border-border"
+                  >
+                    <ChevronLeft className="h-4 w-4 mr-1" />
+                    Previous
+                  </Button>
+                  <div className="flex items-center gap-1">
+                    {Array.from({ length: personalPagination.totalPages }, (_, i) => i + 1).map((page) => (
+                      <Button
+                        key={page}
+                        variant={page === personalPage ? "default" : "outline"}
+                        size="sm"
+                        onClick={() => handlePersonalPageChange(page)}
+                        className={page === personalPage ? "bg-primary text-primary-foreground" : "border-border"}
+                      >
+                        {page}
+                      </Button>
+                    ))}
+                  </div>
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    onClick={() => handlePersonalPageChange(personalPage + 1)}
+                    disabled={personalPage === personalPagination.totalPages}
+                    className="border-border"
+                  >
+                    Next
+                    <ChevronRight className="h-4 w-4 ml-1" />
+                  </Button>
+                </div>
+              </div>
+            </TabsContent>
+
+            {/* Group Rooms Tab */}
+            <TabsContent value="group" className="space-y-4">
+              <div className="flex items-center justify-between">
+                <div className="relative flex-1 max-w-sm">
+                  <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-muted-foreground h-4 w-4" />
+                  <Input
+                    placeholder="Search by name or code..."
+                    value={searchTerm}
+                    onChange={(e) => setSearchTerm(e.target.value)}
+                    className="pl-10 bg-background border-border"
+                  />
+                </div>
+              </div>
+
+              <div className="rounded-md border border-border">
+                <Table>
+                  <TableHeader>
+                    <TableRow className="border-border hover:bg-muted/50">
+                      <TableHead
+                        className="text-muted-foreground cursor-pointer hover:text-card-foreground"
+                        onClick={() => handleGroupSort("roomName")}
+                      >
+                        Room Name {renderSortIcon("roomName", groupSortBy, groupOrder)}
+                      </TableHead>
+                      <TableHead
+                        className="text-muted-foreground cursor-pointer hover:text-card-foreground"
+                        onClick={() => handleGroupSort("roomCode")}
+                      >
+                        Code {renderSortIcon("roomCode", groupSortBy, groupOrder)}
+                      </TableHead>
+                      <TableHead
+                        className="text-muted-foreground cursor-pointer hover:text-card-foreground"
+                        onClick={() => handleGroupSort("roomType")}
+                      >
+                        Type {renderSortIcon("roomType", groupSortBy, groupOrder)}
+                      </TableHead>
+                      <TableHead
+                        className="text-muted-foreground cursor-pointer hover:text-card-foreground"
+                        onClick={() => handleGroupSort("focusTime")}
+                      >
+                        Focus Time {renderSortIcon("focusTime", groupSortBy, groupOrder)}
+                      </TableHead>
+                      <TableHead
+                        className="text-muted-foreground cursor-pointer hover:text-card-foreground"
+                        onClick={() => handleGroupSort("participantCount")}
+                      >
+                        Participants {renderSortIcon("participantCount", groupSortBy, groupOrder)}
+                      </TableHead>
+                      <TableHead
+                        className="text-muted-foreground cursor-pointer hover:text-card-foreground"
+                        onClick={() => handleGroupSort("messageCount")}
+                      >
+                        Messages {renderSortIcon("messageCount", groupSortBy, groupOrder)}
+                      </TableHead>
+                      <TableHead
+                        className="text-muted-foreground cursor-pointer hover:text-card-foreground"
+                        onClick={() => handleGroupSort("roomStatus")}
+                      >
+                        Status {renderSortIcon("roomStatus", groupSortBy, groupOrder)}
+                      </TableHead>
+                      <TableHead className="text-right text-muted-foreground">Actions</TableHead>
+                    </TableRow>
+                  </TableHeader>
+                  <TableBody>
+                    {filteredGroupRooms.map((room) => {
+                      const status = getRoomStatusBadge(room.roomStatus)
+                      const type = getRoomTypeBadge(room.roomType)
+                      return (
+                        <TableRow key={room.id} className="border-border hover:bg-muted/50">
+                          <TableCell className="font-medium text-card-foreground">{room.roomName}</TableCell>
+                          <TableCell>
+                            <Badge variant="outline" className="border-border text-card-foreground font-mono">
+                              {room.roomCode}
+                            </Badge>
+                          </TableCell>
+                          <TableCell>
+                            <Badge variant="outline" className={type.class}>
+                              {type.label}
+                            </Badge>
+                          </TableCell>
+                          <TableCell>
+                            <div className="flex items-center space-x-1">
+                              <Clock className="h-3 w-3 text-muted-foreground" />
+                              <span className="text-card-foreground">{room.focusTime}m</span>
+                            </div>
+                          </TableCell>
+                          <TableCell>
+                            <div className="flex items-center space-x-1">
+                              <Users className="h-3 w-3 text-muted-foreground" />
+                              <span className="text-card-foreground">{room.participantCount}</span>
+                            </div>
+                          </TableCell>
+                          <TableCell className="text-card-foreground">{room.messageCount}</TableCell>
+                          <TableCell>
+                            <Badge variant="outline" className={status.class}>
+                              {status.label}
+                            </Badge>
+                          </TableCell>
+                          <TableCell className="text-right">
+                            <DropdownMenu>
+                              <DropdownMenuTrigger asChild>
+                                <Button
+                                  variant="ghost"
+                                  className="h-8 w-8 p-0 text-muted-foreground hover:text-card-foreground"
+                                >
+                                  <MoreHorizontal className="h-4 w-4" />
+                                </Button>
+                              </DropdownMenuTrigger>
+                              <DropdownMenuContent align="end" className="bg-card border-border">
+                                <DropdownMenuItem className="text-card-foreground hover:bg-muted">
+                                  <Edit className="mr-2 h-4 w-4" />
+                                  Edit
+                                </DropdownMenuItem>
+                                <DropdownMenuItem className="text-card-foreground hover:bg-muted">
+                                  <Users className="mr-2 h-4 w-4" />
+                                  View Participants
+                                </DropdownMenuItem>
+                                <DropdownMenuItem className="text-destructive hover:bg-destructive/10">
+                                  <Trash2 className="mr-2 h-4 w-4" />
+                                  Delete
+                                </DropdownMenuItem>
+                              </DropdownMenuContent>
+                            </DropdownMenu>
+                          </TableCell>
+                        </TableRow>
+                      )
+                    })}
+                  </TableBody>
+                </Table>
+              </div>
+
+              <div className="flex items-center justify-between px-2">
+                <div className="text-sm text-muted-foreground">
+                  Showing {(groupPagination.page - 1) * groupPagination.limit + 1} to{" "}
+                  {Math.min(groupPagination.page * groupPagination.limit, groupPagination.total)} of{" "}
+                  {groupPagination.total} results
+                </div>
+                <div className="flex items-center space-x-2">
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    onClick={() => handleGroupPageChange(groupPage - 1)}
+                    disabled={groupPage === 1}
+                    className="border-border"
+                  >
+                    <ChevronLeft className="h-4 w-4 mr-1" />
+                    Previous
+                  </Button>
+                  <div className="flex items-center gap-1">
+                    {Array.from({ length: groupPagination.totalPages }, (_, i) => i + 1).map((page) => (
+                      <Button
+                        key={page}
+                        variant={page === groupPage ? "default" : "outline"}
+                        size="sm"
+                        onClick={() => handleGroupPageChange(page)}
+                        className={page === groupPage ? "bg-primary text-primary-foreground" : "border-border"}
+                      >
+                        {page}
+                      </Button>
+                    ))}
+                  </div>
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    onClick={() => handleGroupPageChange(groupPage + 1)}
+                    disabled={groupPage === groupPagination.totalPages}
+                    className="border-border"
+                  >
+                    Next
+                    <ChevronRight className="h-4 w-4 ml-1" />
+                  </Button>
+                </div>
+              </div>
+            </TabsContent>
+          </Tabs>
         </CardContent>
       </Card>
     </div>

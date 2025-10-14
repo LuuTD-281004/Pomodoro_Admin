@@ -41,26 +41,28 @@ export default function TransactionsPage() {
   const [page, setPage] = useState(1);
   const [limit] = useState(10);
   const [total, setTotal] = useState(0);
+  const [sortBy, setSortBy] = useState("username");
+  const [order, setOrder] = useState<"ASC" | "DESC">("ASC");
+  
+  const fetchTransactions = async () => {
+    setLoading(true);
+    try {
+      const response = await getTransactions(page, limit);
+      const data = response.result.data;
+      const total = response.result.pagination.total;
+      setTransactions(data);
+      setTotal(total);
+    } catch (err) {
+      console.error("Failed to load transactions", err);
+    } finally {
+      setLoading(false);
+    }
+  };
 
   useEffect(() => {
-    const fetchTransactions = async () => {
-      setLoading(true);
-      try {
-        const response = await getTransactions(page, limit);
-        const data = response.result.data;
-        const total = response.result.pagination.total;
-        setTransactions(data);
-        setTotal(total);
-      } catch (err) {
-        console.error("Failed to load transactions", err);
-      } finally {
-        setLoading(false);
-      }
-    };
-
     fetchTransactions();
   }, [page, limit]);
-
+  console.log(transactions);
   const filteredTransactions = transactions.filter((transaction) => {
     const matchesSearch =
       transaction.id.toLowerCase().includes(searchTerm.toLowerCase()) ||
@@ -129,8 +131,6 @@ export default function TransactionsPage() {
               <div className="p-4 text-center">Loading...</div>
             ) : (
               <Table className="min-w-[900px]">
-                {" "}
-                {/* force min width for scroll */}
                 <TableHeader>
                   <TableRow className="border-border hover:bg-muted/50">
                     <TableHead className="text-muted-foreground w-[160px]">
@@ -147,6 +147,9 @@ export default function TransactionsPage() {
                     </TableHead>
                     <TableHead className="text-muted-foreground w-[160px]">
                       Payment Method
+                    </TableHead>
+                    <TableHead className="text-muted-foreground w-[160px]">
+                      Payment Package
                     </TableHead>
                   </TableRow>
                 </TableHeader>
@@ -206,6 +209,11 @@ export default function TransactionsPage() {
                           <span className="text-card-foreground">
                             {transaction.gateway}
                           </span>
+                        </div>
+                      </TableCell>
+                      <TableCell className="max-w-[160px] truncate">
+                        <div className="font-medium text-card-foreground">
+                          {transaction.paymentPackage?.nameEn}
                         </div>
                       </TableCell>
                     </TableRow>

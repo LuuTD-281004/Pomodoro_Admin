@@ -1,3 +1,4 @@
+import { PaymentPackage } from "./payment-package";
 import { User } from "./user";
 
 export type Transaction = {
@@ -17,5 +18,6 @@ export type Transaction = {
   createdAt: string;
   updatedAt: string;
 
-  user?: User;
+  user: User;
+  paymentPackage: PaymentPackage;
 };
