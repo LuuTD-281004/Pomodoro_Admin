@@ -124,3 +124,29 @@
     @apply bg-background text-foreground;
   }
 }
+
+/* ===== Scrollbar Styles (works for Chrome, Edge, Safari) ===== */
+* {
+  scrollbar-width: thin; /* For Firefox */
+  scrollbar-color: #888 #1a1a1a; /* thumb color | track color */
+}
+
+/* WebKit browsers (Chrome, Edge, Safari) */
+*::-webkit-scrollbar {
+  width: 10px;
+  height: 10px; /* for horizontal scrollbars */
+}
+
+*::-webkit-scrollbar-track {
+  background: #1a1a1a; /* track color */
+}
+
+*::-webkit-scrollbar-thumb {
+  background-color: #888; /* scrollbar color */
+  border-radius: 6px;
+  border: 2px solid #1a1a1a; /* gives some padding look */
+}
+
+*::-webkit-scrollbar-thumb:hover {
+  background-color: #aaa; /* hover color */
+}
