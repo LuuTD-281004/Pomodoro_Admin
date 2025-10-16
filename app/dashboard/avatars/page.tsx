@@ -8,7 +8,6 @@ import { Label } from "@/components/ui/label";
 import { Badge } from "@/components/ui/badge";
 import { Switch } from "@/components/ui/switch";
 import { Plus, Search, ImageIcon, Check, Trash2 } from "lucide-react";
-import axios from "axios";
 import {
   createAvatar,
   deleteAvatar,
@@ -34,6 +33,7 @@ interface Avatar {
   id: string;
   filePath: string;
   stars: number;
+  name: string;
   isPremium: boolean;
   createdAt: string;
   updatedAt: string;
@@ -48,6 +48,7 @@ export default function AvatarsPage() {
   const [searchQuery, setSearchQuery] = useState("");
   const [showCreateForm, setShowCreateForm] = useState(false);
   const [stars, setStars] = useState<number>(0);
+  const [avatarName, setAvatarName] = useState<string>("");
 
   const fetchCloudinaryFiles = async () => {
     try {
@@ -85,6 +86,7 @@ export default function AvatarsPage() {
 
     try {
       const response = await createAvatar(
+        avatarName,
         selectedFile.secure_url,
         isPremium,
         stars
@@ -223,6 +225,19 @@ export default function AvatarsPage() {
                     id="premium"
                     checked={isPremium}
                     onCheckedChange={setIsPremium}
+                  />
+                </div>
+
+                <div className="space-y-1">
+                  <Label htmlFor="price" className="text-card-foreground">
+                    Name
+                  </Label>
+                  <Input
+                    id="name"
+                    type="text"
+                    placeholder="Enter name"
+                    value={avatarName}
+                    onChange={(e) => setAvatarName(e.target.value)}
                   />
                 </div>
 

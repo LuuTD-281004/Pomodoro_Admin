@@ -34,6 +34,7 @@ interface Background {
   id: string;
   filePath: string;
   stars: number;
+  name: string;
   isPremium: boolean;
   createdAt: string;
   updatedAt: string;
@@ -48,6 +49,7 @@ export default function BackgroundsPage() {
   const [searchQuery, setSearchQuery] = useState("");
   const [showCreateForm, setShowCreateForm] = useState(false);
   const [stars, setStars] = useState<number>(0);
+  const [bgName, setBgName] = useState<string>("");
 
   const fetchCloudinaryFiles = async () => {
     try {
@@ -84,6 +86,7 @@ export default function BackgroundsPage() {
 
     try {
       const response = await createBackground(
+        bgName,
         selectedFile.secure_url,
         isPremium,
         stars
@@ -240,6 +243,19 @@ export default function BackgroundsPage() {
 
                 <div className="space-y-1">
                   <Label htmlFor="price" className="text-card-foreground">
+                    Name
+                  </Label>
+                  <Input
+                    id="name"
+                    type="text"
+                    placeholder="Enter name"
+                    value={bgName}
+                    onChange={(e) => setBgName(e.target.value)}
+                  />
+                </div>
+
+                <div className="space-y-1">
+                  <Label htmlFor="price" className="text-card-foreground">
                     Stars
                   </Label>
                   <Input
@@ -316,6 +332,7 @@ export default function BackgroundsPage() {
                   <div className="p-4 space-y-2">
                     <div className="text-xs text-muted-foreground">
                       <p>ID: {background.id.substring(0, 8)}...</p>
+                      <p>Name: {background.name}</p>
                       <p>
                         Created:{" "}
                         {new Date(background.createdAt).toLocaleDateString()}

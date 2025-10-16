@@ -53,12 +53,6 @@ export function DashboardSidebar() {
       icon: BarChart3,
       href: "/dashboard/analytics",
     },
-    {
-      id: "settings",
-      label: "Settings",
-      icon: Settings,
-      href: "/dashboard/settings",
-    },
   ];
 
   return (

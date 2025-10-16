@@ -124,18 +124,12 @@ export function AdminLogin() {
                 {isLoading ? "Signing in..." : "Sign In"}
               </Button>
             </form>
-
-            <div className="mt-6 text-center">
-              <p className="text-xs text-muted-foreground">
-                Demo: Use any email and password to login
-              </p>
-            </div>
           </CardContent>
         </Card>
 
         {/* Footer */}
         <div className="text-center text-xs text-muted-foreground">
-          <p>© 2025 Admin Dashboard. All rights reserved.</p>
+          <p>© 2025 Pomodoro Admin. All rights reserved.</p>
         </div>
       </div>
     </div>

@@ -21,11 +21,13 @@ export async function getAllBackgrounds() {
 }
 
 export async function createAvatar(
+  name: string,
   filePath: string,
   isPremium: boolean,
   stars: number
 ) {
   const response = await http.post("/files/create-avatar", {
+    name: name,
     filePath: filePath,
     isPremium: isPremium,
     stars: stars,
@@ -39,11 +41,13 @@ export async function deleteAvatar(backgroundId: string) {
 }
 
 export async function createBackground(
+  name: string,
   filePath: string,
   isPremium: boolean,
   stars: number
 ) {
   const response = await http.post("/files/create-background", {
+    name: name,
     filePath: filePath,
     isPremium: isPremium,
     stars: stars,
