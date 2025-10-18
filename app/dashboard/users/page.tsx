@@ -78,6 +78,14 @@ export default function UsersPage() {
     return "bg-yellow-100 text-yellow-700 border-yellow-200";
   };
 
+  const getBoughtStatus = (isBought?: boolean) => {
+    if (isBought) {
+      return "bg-green-100 text-green-700 border-green-200";
+    } else {
+      "bg-red-100 text-red-700 border-red-200";
+    }
+  };
+
   return (
     <div className="space-y-6">
       <Card>
@@ -120,8 +128,11 @@ export default function UsersPage() {
                     >
                       User
                     </TableHead>
-                    <TableHead>Role</TableHead>
                     <TableHead>Star</TableHead>
+                    <TableHead>Personal Premium</TableHead>
+                    <TableHead>Group Premium</TableHead>
+                    <TableHead>Plus 3</TableHead>
+                    <TableHead>Plus 10</TableHead>
                     <TableHead
                       onClick={() => {
                         setSortBy("isActive");
@@ -167,12 +178,19 @@ export default function UsersPage() {
                             </div>
                           </div>
                         </TableCell>
+                        <TableCell>{user.userStar || 0}</TableCell>
                         <TableCell>
-                          <Badge>
-                            {user.userRoles?.[0]?.role?.name || "No Role"}
+                          <Badge className={getBoughtStatus(user.isPersonalPremium)}>
+                            {user.isPersonalPremium ? "active" : "Inactive"}
                           </Badge>
                         </TableCell>
-                        <TableCell>{user.userStar || 0}</TableCell>
+                        <TableCell>
+                          <Badge className={getBoughtStatus(user.isGroupPremium)}>
+                            {user.isGroupPremium ? "Bought" : "Inactive"}
+                          </Badge>
+                        </TableCell>
+                        <TableCell>{user.plus3Bought}</TableCell>
+                        <TableCell>{user.plus10Bought}</TableCell>
                         <TableCell>
                           <Badge className={getStatusBadge(user.isActive)}>
                             {user.isActive === 1
