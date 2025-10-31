@@ -1,6 +1,6 @@
 "use client"
 
-import { CheckCircle, AlertCircle, Info, AlertTriangle } from "lucide-react"
+import { CheckCircle, AlertCircle, AlertTriangle } from "lucide-react"
 import { toast } from "@/hooks/use-toast"
 
 export const showNotification = {

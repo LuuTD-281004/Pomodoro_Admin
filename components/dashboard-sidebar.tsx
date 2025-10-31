@@ -21,6 +21,12 @@ export function DashboardSidebar() {
   const pathname = usePathname();
 
   const menuItems = [
+    {
+      id: "overview",
+      label: "Overview",
+      icon: Home,
+      href: "/dashboard/overview",
+    },
     { id: "users", label: "Users", icon: Users, href: "/dashboard/users" },
     { id: "rooms", label: "Rooms", icon: Home, href: "/dashboard/rooms" },
     {
